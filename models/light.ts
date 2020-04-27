@@ -3,14 +3,14 @@ import { BrightnessState } from './states/brightness';
 import { ColorState } from './states/color';
 import { OnOffState } from './states/onoff';
 
-export type LightDevice = BaseDevice & {
+type BasicLightDevice = BaseDevice & {
     type: 'light';
     brightnessControl: false;
     colorControl?: false;
     state: OnOffState;
 };
 
-export type LightDeviceWithBrightness = BaseDevice & {
+type LightDeviceWithBrightness = BaseDevice & {
     type: 'light';
     brightnessControl: true;
     turnOnWhenBrightnessChanges?: boolean; // when set: turn on light when brightness or color change
@@ -18,10 +18,12 @@ export type LightDeviceWithBrightness = BaseDevice & {
     state: BrightnessState & OnOffState;
 };
 
-export type LightDeviceWithColor = BaseDevice & {
+type LightDeviceWithColor = BaseDevice & {
     type: 'light';
     brightnessControl: true;
     turnOnWhenBrightnessChanges?: boolean;
     colorControl: true;
     state: ColorState & BrightnessState & OnOffState;
 };
+
+export type LightDevice = BasicLightDevice | LightDeviceWithBrightness | LightDeviceWithColor;
