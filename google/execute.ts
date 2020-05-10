@@ -14,6 +14,9 @@ export enum ExecuteCommandTypes {
     VolumeRelative = 'action.devices.commands.volumeRelative',
     OpenClose = 'action.devices.commands.OpenClose',
     LockUnlock = 'action.devices.commands.LockUnlock',
+    StartStop = 'action.devices.commands.StartStop',
+    PauseUnpause = 'action.devices.commands.PauseUnpause',
+    Dock = 'action.devices.commands.Dock',
 }
 
 export function getStateChanges(command: ExecuteCommandTypes, params: any, device: Device) {
@@ -90,6 +93,28 @@ export function getStateChanges(command: ExecuteCommandTypes, params: any, devic
                 const newVolume = Math.min(100, Math.max(0, device.state.currentVolume + delta));
                 return {
                     currentVolume: newVolume,
+                };
+            }
+            break;
+
+        case ExecuteCommandTypes.StartStop:
+        case ExecuteCommandTypes.PauseUnpause:
+            if (device.type === 'vacuum' && 'isRunning' in device.state) {
+                let running = device.state.isRunning
+                let paused = device.state.isPaused
+                const { start, pause } = params;
+                if (start != null) {
+                    running = start
+                    paused = false
+                }
+                if (pause != null) {
+                    running = true
+                    paused = pause
+                }
+                return {
+                    isRunning: running,
+                    isPaused: paused,
+                    isDocked: false
                 };
             }
             break;
