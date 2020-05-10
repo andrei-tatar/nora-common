@@ -100,16 +100,16 @@ export function getStateChanges(command: ExecuteCommandTypes, params: any, devic
         case ExecuteCommandTypes.StartStop:
         case ExecuteCommandTypes.PauseUnpause:
             if (device.type === 'vacuum' && 'isRunning' in device.state) {
-                let running = device.state.isRunning
-                let paused = device.state.isPaused
+                let running = device.state.isRunning;
+                let paused = device.state.isPaused;
                 const { start, pause } = params;
                 if (start != null) {
-                    running = start
-                    paused = false
+                    running = start,
+                    paused = false;
                 }
                 if (pause != null) {
-                    running = true
-                    paused = pause
+                    running = true,
+                    paused = pause;
                 }
                 return {
                     isRunning: running,
