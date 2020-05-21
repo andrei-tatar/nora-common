@@ -78,7 +78,7 @@ export function getStateChanges(command: ExecuteCommandTypes, params: any, devic
                 const { thermostatTemperatureRelativeDegree, thermostatTemperatureRelativeWeight } = params;
                 const change = thermostatTemperatureRelativeDegree || (thermostatTemperatureRelativeWeight / 2);
                 return {
-                    thermostatTemperatureSetpoint: device.state + change,
+                    thermostatTemperatureSetpoint: device.state.thermostatTemperatureSetpoint + change,
                 };
             }
             break;
