@@ -103,11 +103,11 @@ export function getStateChanges(command: ExecuteCommandTypes, params: any, devic
                 let running = device.state.isRunning;
                 let paused = device.state.isPaused;
                 const { start, pause } = params;
-                if (start != null) {
+                if (start != null && typeof start === 'boolean') {
                     running = start,
                     paused = false;
                 }
-                if (pause != null) {
+                if (pause != null && typeof pause === 'boolean') {
                     running = true,
                     paused = pause;
                 }
