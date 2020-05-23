@@ -1,5 +1,5 @@
-import { isEqual } from 'lodash';
 import { Device } from '../models';
+import { ColorState } from '../models/states/color';
 
 export enum ExecuteCommandTypes {
     OnOff = 'action.devices.commands.OnOff',
@@ -54,7 +54,7 @@ export function getStateChanges(command: ExecuteCommandTypes, params: any, devic
                     if (device.brightnessControl &&
                         device.colorControl &&
                         device.turnOnWhenBrightnessChanges &&
-                        !isEqual(device.state.color, update.color)) {
+                        !isEqualColor(device.state.color, update.color)) {
                         return {
                             on: true,
                             ...update,
@@ -81,7 +81,7 @@ export function getStateChanges(command: ExecuteCommandTypes, params: any, devic
                 const { thermostatTemperatureRelativeDegree, thermostatTemperatureRelativeWeight } = params;
                 const change = thermostatTemperatureRelativeDegree || (thermostatTemperatureRelativeWeight / 2);
                 return {
-                    thermostatTemperatureSetpoint: device.state + change,
+                    thermostatTemperatureSetpoint: device.state.thermostatTemperatureSetpoint + change,
                 };
             }
             break;
@@ -123,4 +123,10 @@ export function getStateChanges(command: ExecuteCommandTypes, params: any, devic
             console.warn(`unsupported execution command: ${command}`);
             break;
     }
+}
+
+function isEqualColor(color: ColorState['color'], target: ColorState['color']) {
+    return color.spectrumHsv.hue === target.spectrumHsv.hue &&
+        color.spectrumHsv.saturation === target.spectrumHsv.saturation &&
+        color.spectrumHsv.value === target.spectrumHsv.value;
 }
