@@ -14,6 +14,9 @@ export enum ExecuteCommandTypes {
     VolumeRelative = 'action.devices.commands.volumeRelative',
     OpenClose = 'action.devices.commands.OpenClose',
     LockUnlock = 'action.devices.commands.LockUnlock',
+    StartStop = 'action.devices.commands.StartStop',
+    PauseUnpause = 'action.devices.commands.PauseUnpause',
+    Dock = 'action.devices.commands.Dock',
 }
 
 export function getStateChanges(command: ExecuteCommandTypes, params: any, device: Device) {
@@ -92,6 +95,32 @@ export function getStateChanges(command: ExecuteCommandTypes, params: any, devic
                     currentVolume: newVolume,
                 };
             }
+            break;
+
+        case ExecuteCommandTypes.StartStop:
+        case ExecuteCommandTypes.PauseUnpause:
+            if (device.type === 'vacuum' && 'isRunning' in device.state) {
+                let running = device.state.isRunning;
+                let paused = device.state.isPaused;
+                const { start, pause } = params;
+                if (start != null && typeof start === 'boolean') {
+                    running = start,
+                    paused = false;
+                }
+                if (pause != null && typeof pause === 'boolean') {
+                    running = true,
+                    paused = pause;
+                }
+                return {
+                    isRunning: running,
+                    isPaused: paused,
+                    isDocked: false
+                };
+            }
+            break;
+
+        default:
+            console.warn(`unsupported execution command: ${command}`);
             break;
     }
 }

@@ -7,13 +7,14 @@ import { SceneDevice } from './scene';
 import { SpeakerDevice } from './speaker';
 import { SwitchDevice } from './switch';
 import { ThermostatDevice } from './thermostat';
+import { VacuumDevice } from './vacuum';
 
 export interface Devices {
     [id: string]: Device;
 }
 
 export type Device = SwitchDevice | LightDevice | SceneDevice | OutletDevice | ThermostatDevice |
-    SpeakerDevice | BlindsDevice | GarageDevice | LockDevice;
+    SpeakerDevice | BlindsDevice | GarageDevice | LockDevice | VacuumDevice;
 
 export type AllStates = Device['state'];
 
