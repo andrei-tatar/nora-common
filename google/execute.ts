@@ -17,6 +17,9 @@ export enum ExecuteCommandTypes {
     StartStop = 'action.devices.commands.StartStop',
     PauseUnpause = 'action.devices.commands.PauseUnpause',
     Dock = 'action.devices.commands.Dock',
+    SetFanSpeed = 'action.devices.commands.SetFanSpeed',
+    SetFanSpeedRelativeSpeed = 'action.devices.commands.SetFanSpeedRelativeSpeed',
+    Reverse = 'action.devices.commands.Reverse',
 }
 
 export function getStateChanges(command: ExecuteCommandTypes, params: any, device: Device) {
@@ -40,7 +43,9 @@ export function getStateChanges(command: ExecuteCommandTypes, params: any, devic
         case ExecuteCommandTypes.ThermostatTemperatureSetpoint:
         case ExecuteCommandTypes.ThermostatTemperatureSetRange:
         case ExecuteCommandTypes.ThermostatSetMode:
+        case ExecuteCommandTypes.SetFanSpeed:
         case ExecuteCommandTypes.OpenClose:
+        case ExecuteCommandTypes.Reverse:
             return params;
 
         case ExecuteCommandTypes.ColorAbsolute:
@@ -116,6 +121,39 @@ export function getStateChanges(command: ExecuteCommandTypes, params: any, devic
                     isPaused: paused,
                     isDocked: false
                 };
+            }
+            break;
+            
+        case ExecuteCommandTypes.SetFanSpeedRelativeSpeed:
+            if (device.type === 'fan') {
+                const { fanSpeedRelativeWeight, fanSpeedRelativePercent } = params;
+                if (fanSpeedRelativePercent != null && device.supportsFanSpeedPercent) {
+                    var new_fan_speed = device.state.currentFanSpeedPercent + fanSpeedRelativeWeight;
+                    if (new_fan_speed < 0) {
+                        new_fan_speed = 0;
+                    }
+                    if (new_fan_speed > 100) {
+                        new_fan_speed = 100;
+                    }
+                    return {'currentFanSpeedPercent': new_fan_speed };
+                }
+                if (fanSpeedRelativeWeight != null) {
+                    var speed_index = 0;
+                    for (var i = 0; i < device.availableFanSpeeds.speeds.length; i++) {
+                        if (device.availableFanSpeeds.speeds[i]['speed_name'] === device.state.currentFanSpeedSetting) {
+                            speed_index = i;
+                        }
+                    }
+                    var new_speed_index = speed_index - fanSpeedRelativeWeight;
+                    if (new_speed_index < 0) {
+                        new_speed_index = 0;
+                    }
+                    if (new_speed_index >= device.availableFanSpeeds.speeds.length) {
+                        new_speed_index = device.availableFanSpeeds.speeds.length - 1;
+                    }
+                    var newFanSpeedSetting = device.availableFanSpeeds.speeds[new_speed_index]['speed_name'];
+                    return {'currentFanSpeedSetting': newFanSpeedSetting };
+                }
             }
             break;
 
